@@ -1,0 +1,23 @@
+try
+{
+    "Logging in to Azure..."
+    Connect-AzAccount -Identity
+}
+catch {
+    Write-Error -Message $_.Exception
+    throw $_.Exception
+}
+
+#-----------------------------------------Code-------------------------------------------
+#----Input----
+$ResourceGroupName = "RG name"
+$VMName = "Vm name"
+$location = "Location/Region"
+#----------------------------------
+$datetime = Get-Date -f MM-dd-yyyy_HH_mm_ss
+$snapshotName = 'Snapshot-' + $datetime
+
+$vm = Get-AzVM -ResourceGroupName $ResourceGroupName -VMName $VMName
+$snapshot = New-AzSnapshotConfig -SourceUri $vm.StorageProfile.OsDisk.ManagedDisk.Id -Location $location -CreateOption copy
+New-AzSnapshot -Snapshot $snapshot -SnapshotName $snapshotName -ResourceGroupName $ResourceGroupName 
+Get-AzSnapshot -ResourceGroupName $ResourceGroupName
