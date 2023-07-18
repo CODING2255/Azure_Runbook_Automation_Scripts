@@ -1,0 +1,39 @@
+try
+{
+    "Logging in to Azure..."
+    Connect-AzAccount -Identity
+}
+catch {
+    Write-Error -Message $_.Exception
+    throw $_.Exception
+}
+#------------------------------------Code-------------------------
+# Define variables
+$resourceGroupName = "RGname"
+$serverName = "Servername"
+$databaseName = "DBname"
+$newVCoreCount = "which core to change to"
+
+
+$database = Get-AzSqlDatabase -ResourceGroupName $resourceGroupName -ServerName $serverName -DatabaseName $databaseName 
+$cpv = $database.CurrentServiceObjectiveName
+if( $cpv -match $newVCoreCount)
+{
+# Check the VCore status is the same
+
+$database = Get-AzSqlDatabase -ResourceGroupName $resourceGroupName -ServerName $serverName -DatabaseName $databaseName 
+$cpv = $database.CurrentServiceObjectiveName
+Write-output "`n`nCurrent VCore State:" $cpv "NO Changes made"
+
+}else{
+
+  # Scale down the database to the new VCore
+  $olcpv = $database.CurrentServiceObjectiveName
+  $st = Set-AzSqlDatabase -ResourceGroupName $resourceGroupName -ServerName $serverName -DatabaseName $databaseName -RequestedServiceObjectiveName $newVCoreCount -Edition "GeneralPurpose" 
+
+# Check the new VCore status
+$database = Get-AzSqlDatabase -ResourceGroupName $resourceGroupName -ServerName $serverName -DatabaseName $databaseName
+$cpv = $database.CurrentServiceObjectiveName
+Write-output "`n`n"$olcpv"`nUpdated to `nNew VCore : "$newVCoreCount
+Write-output "`n`nCurrent VCore State:" $cpv
+}
