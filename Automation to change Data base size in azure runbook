@@ -1,0 +1,32 @@
+try
+{
+    "Logging in to Azure..."
+    Connect-AzAccount -Identity
+}
+catch {
+    Write-Error -Message $_.Exception
+    throw $_.Exception
+}
+
+#----------------------------------Code------------------------------
+
+$ResourceGroupName = "RGname"
+$ServerName = "SVname"
+$DatabaseName = "DBname"
+$UGDatabaseName = "what should be the size ex: basic, Standard "
+
+#get the current status 
+$db1 = Get-AzSqlDatabase -ResourceGroupName $ResourceGroupName -ServerName $ServerName -DatabaseName $DatabaseName
+$dbe = $db1.SkuName
+
+if ($dbe -match "Basic") # if the current size is Basic no changes else it will change to the given size
+{
+write-output "SQL database is already a $dbe"
+}else {
+$db1 = Get-AzSqlDatabase -ResourceGroupName $ResourceGroupName -ServerName $ServerName -DatabaseName $DatabaseName
+$db1.SkuName = $UGDatabaseName
+
+Set-AzSqlDatabase -ResourceGroupName $ResourceGroupName -DatabaseName $DatabaseName -ServerName $ServerName -Edition $UGDatabaseName
+
+write-output "The SQL database has been resized to $dbe"
+}
