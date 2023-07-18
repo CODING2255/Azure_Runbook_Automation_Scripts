@@ -1,3 +1,14 @@
+try
+{
+    "Logging in to Azure..."
+    Connect-AzAccount -Identity
+}
+catch {
+    Write-Error -Message $_.Exception
+    throw $_.Exception
+}
+
+# ----------------------------------Code------------------------------------
 $ResourceGroupName = "RGname"
 $Name = "VMName"
 
