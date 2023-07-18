@@ -19,7 +19,7 @@ $UGDatabaseName = "what should be the size ex: basic, Standard "
 $db1 = Get-AzSqlDatabase -ResourceGroupName $ResourceGroupName -ServerName $ServerName -DatabaseName $DatabaseName
 $dbe = $db1.SkuName
 
-if ($dbe -match "Basic") # if the current size is Basic no changes else it will change to the given size
+if ($dbe -match "$UGDatabaseName") # if the current size is $UGDatabaseName no changes else it will change to the given $UGDatabaseName size
 {
 write-output "SQL database is already a $dbe"
 }else {
