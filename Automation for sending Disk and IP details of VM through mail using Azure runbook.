@@ -1,0 +1,74 @@
+try
+{
+    "Logging in to Azure..."
+    Connect-AzAccount -Identity
+}
+catch {
+    Write-Error -Message $_.Exception
+    throw $_.Exception
+}
+
+#-----------------------------------------------------Code---------------------------------------
+
+$ResourceGroupName = "RG name"
+$from_mail = "mailid of the sender"
+$Pass = "password of the sender"
+$to_mail = "mailid of the reciver"
+
+
+
+#---------------------------------------IP------------------------------------
+
+$iplist = @()
+$ipp = Get-AzPublicIpAddress -ResourceGroupName $ResourceGroupName
+
+foreach($ip in $ipp.name){
+ $iplist += "-------------------------------- IP_Detailes --------------------------------"
+ $snt = Get-AzPublicIpAddress -ResourceGroupName $ResourceGroupName -name "$ip"
+ $null=0 
+#Checks if the IP is assigned to any Vm or nic
+ if ($snt.IpConfiguration.Id -eq $null)
+  {
+  
+  $ssna = $snt.name
+  $iplist += "`nNot Assinged to VM or Nic`nNIC Name : None `nIP name : $ssna `n"
+  }elseif($st.VirtualMachine -eq $null)
+   {
+   $snic = $snt.IpConfiguration.Id.Split('/')[-3] 
+   $st = Get-AzNetworkInterface -ResourceGroupName $ResourceGroupName -name "$snic"
+    $ssn = $st.name
+    $sst = $st.IpConfigurations[0].PublicIpAddress.Name
+     $iplist += "`nThe VM is deleted`nNIC Name : $ssn `nIP name : $sst `n"
+    }else {
+     $ssn = $st.name
+     $sst = $st.IpConfigurations[0].PublicIpAddress.Name
+     $iplist += "`nAssigned VM`nNIC Assinged : $ssn `nIP name : $sst `n "
+    }
+}
+$iplist
+
+#---------------------------------------Disk------------------------------------
+$dslist = @()
+$nd = Get-AzDisk -ResourceGroupName $ResourceGroupName
+
+ForEach ($ds in $nd.name){
+$dslist += "-------------------------------- Disk_Detailes --------------------------------"
+$dst = Get-AzDisk -ResourceGroupName $ResourceGroupName -Name "$ds"
+if ($dst.DiskState -match "Unattached")
+{
+$ddss = $dst.DiskState
+$ddst = $dst.Name
+$dslist += "`nStatus : $ddss `nIdel Disk`nDisk Name: $ddst`n"
+}else {
+$ddss = $dst.DiskState
+$ddst = $dst.Name
+$dslist += "`nStatus : $ddss `nDisk Assinged to : $ddst`n "
+}
+}
+$dslist
+
+#"---------------------------Mail--------------------------"
+
+$secPassword = ConvertTo-SecureString $Pass -AsPlainText -Force
+$cred = New-Object System.Management.Automation.PSCredential ("$from_mail", $secPassword)
+Send-MailMessage -From "$from_mail" -To "$to_mail" -Subject 'Report on Disk and Ip from Automation' -Body "$iplist `n $dslist" -Credential $cred -SmtpServer "smtp.office365.com" -Port 587 -UseSsl
