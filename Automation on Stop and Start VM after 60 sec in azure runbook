@@ -1,0 +1,21 @@
+$ResourceGroupName = "RGname"
+$Name = "VMName"
+
+$status=Get-AzVM -Name $Name -Status | Select-Object  @{ label = “VMStatus”; Expression = { $_.PowerState } } | Format-Table -HideTableHeaders | Out-String
+
+if ($status -match "VM deallocated") 
+{
+     write-Output "`n`n######################################################################"
+     write-Output "******************** $Name VM is Stopped No Changes ******************"
+     write-Output "######################################################################`n`n`n"
+
+ }elseIf ($status -match "VM running") 
+ {
+    write-Output "`n`n######################################################################" 
+    Stop-AzVM -ResourceGroupName "$ResourceGroupName" -Name "$Name" -force
+    write-Output "******************** $Name VM stopped ********************************"
+    Start-Sleep -Seconds 60
+    Start-AzVM -ResourceGroupName "$ResourceGroupName" -Name "$Name"
+    write-Output "******************** $Name VM started ********************************"
+    write-Output "######################################################################`n`n`n"
+  } 
