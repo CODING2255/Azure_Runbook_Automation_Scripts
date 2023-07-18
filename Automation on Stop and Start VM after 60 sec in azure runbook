@@ -8,7 +8,7 @@ catch {
     throw $_.Exception
 }
 
-# ----------------------------------Code------------------------------------
+# ----------------------------------Code for a single VM------------------------------------
 $ResourceGroupName = "RGname"
 $Name = "VMName"
 
@@ -17,7 +17,7 @@ $status=Get-AzVM -Name $Name -Status | Select-Object  @{ label =�
 if ($status -match "VM deallocated") 
 {
      write-Output "`n`n######################################################################"
-     write-Output "******************** $Name VM is Stopped No Changes ******************"
+     write-Output "******************** $Name VM is already Stopped No Changes ******************"
      write-Output "######################################################################`n`n`n"
 
  }elseIf ($status -match "VM running") 
@@ -30,3 +30,32 @@ if ($status -match "VM deallocated")
     write-Output "******************** $Name VM started ********************************"
     write-Output "######################################################################`n`n`n"
   } 
+#######################################################################################################
+
+############################################################################################################3
+#------------------------- Stop and Start multiple VM in a RG -------------------------------
+
+$RG = "ResourceGroupName"
+$VMN ="VM1","VM2","VM3"; # VM names
+
+ForEach ($Name in $VMN){
+
+$status=Get-AzVM -Name $Name -Status | Select-Object  @{ label = “VMStatus”; Expression = { $_.PowerState } } | Format-Table -HideTableHeaders | Out-String
+
+if ($status -match "VM deallocated") 
+{
+     write-Output "######################################################################"
+     write-Output "******************** $Name VM is already Stopped No Changes ******************"
+     write-Output "######################################################################`n`n`n"
+
+ }elseIf ($status -match "VM running") 
+ {
+    write-Output "######################################################################" 
+    Stop-AzVM -ResourceGroupName "$RG" -Name "$Name" -force
+    write-Output "******************** $Name VM stopped ********************************"
+    #Start-Sleep -Seconds 60
+    #Start-AzVM -ResourceGroupName "$RG" -Name "$Name"
+    #write-Output "******************** $Name VM started ********************************"
+    #write-Output "######################################################################`n`n`n"
+  } 
+ }
