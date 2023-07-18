@@ -1,0 +1,35 @@
+try
+{
+    "Logging in to Azure..."
+    Connect-AzAccount -Identity
+}
+catch {
+    Write-Error -Message $_.Exception
+    throw $_.Exception
+}
+#-------------------------------------Code------------------------
+
+$rg = "RG1","RG2" # input the Resource Group names
+
+foreach($rgs in $rg)
+{
+    if ($rgs -match "RG1")
+    {
+        $aksclusters = "akcl name" #Input akscluster name
+        foreach($cluster in $aksclusters)
+        {
+            stop-AzAksCluster -ResourceGroupName $rgs -Name $cluster
+            Write-Host "`n $cluster has Stopped"
+           
+        }
+    }elseif ($rgs -match "RG2")
+    {
+      $aksclusters = "akcl name" #akscluster name
+      foreach($cluster in $aksclusters)
+        {
+            stop-AzAksCluster -ResourceGroupName $rgs -Name $cluster
+            Write-Host "`n $cluster has Stopped"
+            
+        }
+    }   
+}
