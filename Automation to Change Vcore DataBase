@@ -12,7 +12,7 @@ catch {
 $resourceGroupName = "RGname"
 $serverName = "Servername"
 $databaseName = "DBname"
-$newVCoreCount = "which core to change to"
+$newVCoreCount = "which core to change to like GP_Gen5_2,GP_Gen5_4"
 
 
 $database = Get-AzSqlDatabase -ResourceGroupName $resourceGroupName -ServerName $serverName -DatabaseName $databaseName 
