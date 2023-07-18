@@ -11,9 +11,9 @@ catch {
 #-----------------------------------------------------Code---------------------------------------
 
 $ResourceGroupName = "RG name"
-$from_mail = "mailid of the sender"
+$from_mail = "mail id of the sender"
 $Pass = "password of the sender"
-$to_mail = "mailid of the reciver"
+$to_mail = "mail id of the receiver"
 
 
 
