@@ -1,0 +1,28 @@
+try
+{
+    "Logging in to Azure..."
+    Connect-AzAccount -Identity
+}
+catch {
+    Write-Error -Message $_.Exception
+    throw $_.Exception
+}
+
+#-----------------------------------------Code-------------------------------------------
+
+$ResourceGroupName = "RGname"
+$VMName = "VMname"
+$UPSize = "what size to change to ? ex: Standard_B1s"
+
+$vm1 = Get-AzVM -ResourceGroupName $ResourceGroupName -VMName $VMname
+$VMSize = $vm1.HardwareProfile.VmSize
+
+if ($VMSize -match $UPSize) #if the VM size is the given $UPsize no changes else it will change to upsize 
+{
+write-output "VM is already a $VMSize"
+}else {
+$vm = Get-AzVM -ResourceGroupName $ResourceGroupName -VMName $VMName
+$vm.HardwareProfile.VmSize = $UPSize
+Update-AzVM -VM $vm -ResourceGroupName $ResourceGroupName
+write-output "The Virtual Machine has been resized to $VMSize"
+}
