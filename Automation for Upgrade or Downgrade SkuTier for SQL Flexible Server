@@ -1,0 +1,42 @@
+==================================
+To Upgrade/Downgrade SkuTier for SQL Flexible Server
+==================================
+
+###########################################################################################
+
+try
+{
+    "Logging in to Azure..."
+    Connect-AzAccount -Identity
+}
+catch {
+    Write-Error -Message $_.Exception
+    throw $_.Exception
+}
+
+
+$svn = "<Server Name>"
+$RG ="<ResourceGroupName>" 
+
+$st = "< Basic <OR> GeneralPurpose <OR> MemoryOptimized" > # Mention the SkuTier you would like to Change into
+$upsku = "< Standard_E8ads_v5 <OR> Standard_D4ads_v5 >" # Mention the SkuName you would like to Change into
+
+$tsku = (Get-AzMySqlFlexibleServer -ResourceGroupName $RG -ServerName $svn).SkuTier # Get Current SkuTier info
+$sku = (Get-AzMySqlFlexibleServer -ResourceGroupName $RG -ServerName $svn).SkuName  # Get Current SkuName info
+
+# The below statment will check if the current SkuTier is same as the given SkuTier
+
+if($tsku -match $st)
+{
+ write-Output "No changes required already in"$sku $tsku 
+}else 
+ {
+  write-Output "##################### Changing to $upsku ###########################"
+  Update-AzMySqlFlexibleServer -ResourceGroupName $RG -Name $svn -Sku $upsku -SkuTier $st
+  $sku = (Get-AzMySqlFlexibleServer -ResourceGroupName $RG -ServerName $svn).SkuName    
+  $tsku = (Get-AzMySqlFlexibleServer -ResourceGroupName $RG -ServerName $svn).SkuTier
+  Write-Host "MySQL flexible server Sku changed successfully to : " $sku $tsku 
+ } 
+
+############################################################################################
+
